@@ -1,0 +1,79 @@
+/* English needs slightly looser word shapes than the CJK layouts. Keep these
+   rules language-scoped so Chinese glyph rhythm and wrapping remain unchanged. */
+html[lang="en"] body {
+  letter-spacing: 0.006em;
+  -webkit-font-smoothing: antialiased;
+}
+
+html[lang="en"] :is(p, li, label, summary) {
+  letter-spacing: 0.008em;
+}
+
+html[lang="en"] :is(button, input, select, .button) {
+  letter-spacing: 0.012em;
+  line-height: 1.35;
+}
+
+html[lang="en"] :is(
+    .hero h1,
+    .section-heading h2,
+    .vg-enhancement-heading h2,
+    .vg-journey__heading h2,
+    .vg-screening-explanation__header h2,
+    .vg-trends-reminder__heading h2,
+    .test-result h3
+  ) {
+  letter-spacing: -0.022em;
+}
+
+html[lang="en"] .result-value {
+  letter-spacing: -0.035em;
+}
+
+html[lang="en"] :is(
+    .brand small,
+    .hero-kicker,
+    .eyebrow,
+    .metric-label,
+    .vg-kicker,
+    .vg-journey__timing > span,
+    .vg-symptoms__summary > strong,
+    .vg-screening-explanation__eyebrow,
+    .vg-screening-explanation__band > span,
+    .vg-screening-explanation__next-step > span,
+    .vg-screening-explanation__metric-cards li > span,
+    .vg-screening-explanation__indicator-list > strong,
+    .vg-screening-explanation__limitations > strong,
+    .vg-screening-explanation__confidence dt,
+    .vg-trends-reminder__eyebrow,
+    .vg-trend-comparison dt
+  ) {
+  letter-spacing: 0.11em;
+  line-height: 1.4;
+}
+
+/* Long English compound labels may wrap, but should never widen a phone page. */
+html[lang="en"] :is(
+    .button,
+    .language-picker,
+    .section-heading,
+    .panel-heading,
+    .vg-enhancement-heading,
+    .vg-journey__heading,
+    .vg-screening-explanation__header,
+    .vg-trends-reminder__heading
+  ) {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 620px) {
+  html[lang="en"] .hero h1 {
+    font-size: clamp(2.45rem, 13vw, 3.8rem);
+    line-height: 1;
+  }
+
+  html[lang="en"] :is(.button, button) {
+    max-width: 100%;
+  }
+}

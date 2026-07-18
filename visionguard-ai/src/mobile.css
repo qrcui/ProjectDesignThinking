@@ -1,0 +1,446 @@
+/* Phone-specific refinements live separately so the desktop visual system stays intact. */
+
+html,
+body,
+#root {
+  max-width: 100%;
+}
+
+@supports (overflow: clip) {
+  html,
+  body {
+    overflow-x: clip;
+  }
+}
+
+@media (pointer: coarse) {
+  button,
+  select,
+  input[type="checkbox"],
+  input[type="radio"] {
+    min-height: 44px;
+  }
+
+  .text-button {
+    min-height: 44px;
+    padding: 8px 4px;
+  }
+
+  .direction-pad button {
+    touch-action: manipulation;
+  }
+}
+
+@media (max-width: 480px) and (orientation: portrait) {
+  .app-shell {
+    width: 100%;
+  }
+
+  .site-header {
+    top: max(6px, env(safe-area-inset-top));
+    width: auto;
+    margin-top: max(6px, env(safe-area-inset-top));
+    margin-right: max(8px, env(safe-area-inset-right));
+    margin-left: max(8px, env(safe-area-inset-left));
+    padding: 9px 10px;
+    gap: 8px;
+    border-radius: 14px;
+  }
+
+  .brand {
+    min-width: 0;
+    gap: 8px;
+  }
+
+  .brand-mark {
+    width: 32px;
+    height: 23px;
+    flex: 0 0 auto;
+  }
+
+  .brand strong {
+    overflow: hidden;
+    font-size: 0.88rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .language-picker select {
+    min-width: 88px;
+    min-height: 44px;
+  }
+
+  main {
+    padding-right: max(10px, env(safe-area-inset-right));
+    padding-bottom: calc(58px + env(safe-area-inset-bottom));
+    padding-left: max(10px, env(safe-area-inset-left));
+  }
+
+  .hero {
+    gap: 24px;
+    padding: 44px 2px 34px;
+  }
+
+  .hero-copy {
+    min-width: 0;
+  }
+
+  .hero h1 {
+    overflow-wrap: anywhere;
+  }
+
+  .hero-copy > p {
+    margin-bottom: 22px;
+    line-height: 1.58;
+  }
+
+  .hero-actions {
+    display: grid;
+    width: 100%;
+    grid-template-columns: 1fr;
+  }
+
+  .hero-actions .button {
+    width: 100%;
+  }
+
+  .hero-proof {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px 14px;
+    margin-top: 24px;
+    text-align: left;
+  }
+
+  .hero-proof span {
+    display: grid;
+    gap: 2px;
+  }
+
+  .hero-visual {
+    width: min(88vw, 330px);
+  }
+
+  .hero-readout {
+    min-width: 108px;
+    padding: 9px 10px;
+  }
+
+  .hero-readout strong {
+    font-size: 0.94rem;
+  }
+
+  .medical-notice,
+  .setup-overview,
+  .panel,
+  .vg-enhancement-panel,
+  .vg-journey,
+  .vg-screening-explanation,
+  .vg-trends-reminder {
+    border-radius: 16px;
+  }
+
+  .setup-overview {
+    padding: 15px;
+  }
+
+  .camera-panel,
+  .metrics-panel,
+  .calibration-card {
+    padding: 14px;
+  }
+
+  .panel-heading,
+  .section-heading {
+    gap: 12px;
+  }
+
+  .camera-stage {
+    width: 100%;
+    height: auto;
+    min-height: 0;
+    max-height: calc(100dvh - 150px);
+    aspect-ratio: 3 / 4;
+    margin-top: 16px;
+  }
+
+  .camera-placeholder {
+    padding: 18px;
+  }
+
+  .camera-placeholder-icon {
+    transform: rotate(-45deg) scale(0.8);
+  }
+
+  .camera-overlay-top,
+  .camera-overlay-bottom {
+    right: 14px;
+    left: 14px;
+    gap: 8px;
+    letter-spacing: 0.06em;
+  }
+
+  .camera-overlay-top {
+    top: 16px;
+  }
+
+  .camera-overlay-bottom {
+    bottom: 16px;
+  }
+
+  .camera-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .camera-actions > :first-child {
+    grid-column: 1 / -1;
+  }
+
+  .camera-actions .button,
+  .camera-actions .text-button {
+    width: 100%;
+  }
+
+  .calibration-section,
+  .vision-test-section,
+  .history-section,
+  .method-section {
+    margin-top: 58px;
+  }
+
+  .section-heading > p {
+    line-height: 1.55;
+  }
+
+  .test-shell {
+    border-radius: 16px;
+  }
+
+  .test-copy {
+    padding: 26px 16px;
+  }
+
+  .test-preview-card {
+    min-height: 330px;
+    padding: 24px 12px;
+  }
+
+  .preview-optotype {
+    width: min(72vw, 230px);
+    height: min(72vw, 230px);
+  }
+
+  .test-active {
+    min-height: 650px;
+    padding: 18px 12px 22px;
+  }
+
+  .test-toolbar-actions {
+    display: grid;
+    width: 100%;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 4px 10px;
+  }
+
+  .test-toolbar-actions .distance-lock {
+    grid-column: 1 / -1;
+  }
+
+  .test-toolbar-actions .text-button {
+    width: 100%;
+  }
+
+  .optotype-stage {
+    height: min(42dvh, 300px);
+    min-height: 230px;
+    margin-top: 18px;
+  }
+
+  .direction-pad {
+    width: min(100%, 258px);
+    grid-template-columns: repeat(3, minmax(64px, 74px));
+    grid-template-rows: repeat(2, 64px);
+    margin-top: 14px;
+  }
+
+  .direction-pad button {
+    min-width: 0;
+  }
+
+  .test-result {
+    min-height: 560px;
+    padding: 38px 16px;
+  }
+
+  footer {
+    margin-right: max(10px, env(safe-area-inset-right));
+    margin-left: max(10px, env(safe-area-inset-left));
+    padding-bottom: calc(24px + env(safe-area-inset-bottom));
+  }
+}
+
+@media (max-width: 360px) and (orientation: portrait) {
+  .brand strong {
+    max-width: 116px;
+    font-size: 0.82rem;
+  }
+
+  .language-picker select {
+    min-width: 82px;
+    max-width: 96px;
+    font-size: 0.76rem;
+  }
+
+  .hero h1,
+  html[lang^="zh"] .hero h1 {
+    font-size: clamp(2.35rem, 12.5vw, 3rem);
+  }
+
+  .hero-proof {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* A phone held sideways has enough width for side-by-side work but very little height. */
+@media (orientation: landscape) and (max-height: 520px) and (max-width: 950px) {
+  .site-header {
+    position: relative;
+    top: auto;
+    width: auto;
+    margin: max(5px, env(safe-area-inset-top)) max(8px, env(safe-area-inset-right)) 0
+      max(8px, env(safe-area-inset-left));
+    padding: 8px 12px;
+  }
+
+  main {
+    padding-right: max(10px, env(safe-area-inset-right));
+    padding-bottom: calc(42px + env(safe-area-inset-bottom));
+    padding-left: max(10px, env(safe-area-inset-left));
+  }
+
+  .hero {
+    grid-template-columns: minmax(0, 1fr) minmax(250px, 0.72fr);
+    gap: 22px;
+    min-height: 0;
+    padding: 34px 4px 30px;
+  }
+
+  .hero-copy {
+    text-align: left;
+  }
+
+  .hero h1,
+  .hero-copy > p {
+    margin-right: 0;
+    margin-left: 0;
+  }
+
+  .hero h1,
+  html[lang^="zh"] .hero h1 {
+    font-size: clamp(2.4rem, 6.8vw, 4rem);
+  }
+
+  .hero-copy > p {
+    margin-bottom: 18px;
+    font-size: 0.9rem;
+  }
+
+  .hero-actions,
+  .hero-proof {
+    justify-content: flex-start;
+  }
+
+  .hero-proof {
+    margin-top: 18px;
+  }
+
+  .hero-visual {
+    width: min(38vw, 300px);
+  }
+
+  .dashboard-grid {
+    grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr);
+    gap: 12px;
+  }
+
+  .camera-panel,
+  .metrics-panel,
+  .calibration-card {
+    min-height: 0;
+    padding: 14px;
+  }
+
+  .camera-stage {
+    min-height: 220px;
+    max-height: 62dvh;
+    aspect-ratio: 16 / 9;
+    margin-top: 12px;
+  }
+
+  .camera-actions {
+    margin-top: 10px;
+  }
+
+  .test-setup {
+    grid-template-columns: minmax(0, 1.1fr) minmax(260px, 0.9fr);
+  }
+
+  .test-copy {
+    padding: 24px 20px;
+  }
+
+  .test-preview-card {
+    min-height: 310px;
+    border-top: 0;
+    border-left: 1px solid var(--line);
+  }
+
+  .preview-optotype {
+    width: 210px;
+    height: 210px;
+  }
+
+  .test-active {
+    display: grid;
+    min-height: 0;
+    grid-template-columns: minmax(280px, 1fr) 250px;
+    grid-template-areas:
+      "toolbar toolbar"
+      "optotype question"
+      "optotype controls"
+      "progress progress";
+    gap: 8px 18px;
+    padding: 14px 18px 16px;
+  }
+
+  .test-toolbar {
+    grid-area: toolbar;
+  }
+
+  .optotype-stage {
+    width: 100%;
+    height: min(58dvh, 285px);
+    min-height: 215px;
+    grid-area: optotype;
+    margin: 4px 0;
+  }
+
+  .test-question {
+    grid-area: question;
+  }
+
+  .direction-pad {
+    grid-area: controls;
+    margin: 4px auto;
+  }
+
+  .test-progress {
+    width: 100%;
+    grid-area: progress;
+  }
+
+  .test-result {
+    min-height: 390px;
+  }
+}
