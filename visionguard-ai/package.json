@@ -10,7 +10,7 @@
     "dev": "vite --host 127.0.0.1",
     "build": "tsc -b && vite build",
     "preview": "vite preview --host 127.0.0.1",
-    "test": "vitest run",
+    "test": "vitest run --no-cache",
     "test:watch": "vitest",
     "assets": "node scripts/prepare-assets.mjs --strict",
     "postinstall": "node scripts/prepare-assets.mjs",
@@ -20,10 +20,24 @@
     "desktop:pack": "npm run build && electron-builder --dir",
     "desktop:dist": "npm run build && electron-builder",
     "desktop:dist:win": "npm run build && electron-builder --win",
-    "desktop:dist:mac": "npm run build && electron-builder --mac"
+    "desktop:dist:mac": "npm run build && electron-builder --mac",
+    "desktop:dist:linux": "npm run build && electron-builder --linux",
+    "android:sync": "npm run build && cap sync android",
+    "android:open": "npm run android:sync && cap open android",
+    "android:run": "npm run android:sync && cap run android",
+    "android:apk": "npm run android:sync && cd android && gradlew.bat assembleDebug",
+    "android:apk:unix": "npm run android:sync && cd android && ./gradlew assembleDebug",
+    "android:apk:release": "npm run android:sync && cd android && gradlew.bat assembleRelease",
+    "android:apk:release:unix": "npm run android:sync && cd android && ./gradlew assembleRelease",
+    "android:bundle": "npm run android:sync && cd android && gradlew.bat bundleRelease",
+    "android:bundle:unix": "npm run android:sync && cd android && ./gradlew bundleRelease"
   },
-  "dependencies": {},
   "devDependencies": {
+    "@capacitor/android": "^8.4.2",
+    "@capacitor/cli": "^8.4.2",
+    "@capacitor/core": "^8.4.2",
+    "@capacitor/filesystem": "^8.1.2",
+    "@capacitor/share": "^8.0.1",
     "@mediapipe/tasks-vision": "0.10.35",
     "@types/qrcode": "1.5.6",
     "@types/react": "18.3.18",
@@ -35,11 +49,11 @@
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "typescript": "5.7.3",
-    "vite": "5.4.14",
+    "vite": "^5.4.21",
     "vitest": "2.1.8"
   },
   "engines": {
-    "node": ">=18.18"
+    "node": ">=22.0.0"
   },
   "build": {
     "appId": "ai.visionguard.desktop",
@@ -68,7 +82,13 @@
     },
     "mac": {
       "target": [
-        "dmg"
+        {
+          "target": "dmg",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        }
       ],
       "category": "public.app-category.healthcare-fitness",
       "hardenedRuntime": true,
@@ -77,6 +97,25 @@
       "extendInfo": {
         "NSCameraUsageDescription": "VisionGuard AI uses the camera only after consent to analyze eye and viewing behavior locally on this device."
       }
+    },
+    "linux": {
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "deb",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "category": "Science",
+      "synopsis": "Local camera-based vision screening and eye fatigue monitor",
+      "executableName": "visionguard-ai"
     }
   }
 }

@@ -1,6 +1,6 @@
 # VisionGuard AI Desktop Shell
 
-The optional Electron shell packages the existing production web build for Windows and macOS. It is intended for consented continuous monitoring that must remain active when the main window is minimized or hidden. The browser/HTTPS deployment remains the right choice for QR-based phone access.
+The optional Electron shell packages the existing production web build for Windows, Linux, and macOS. It is intended for consented continuous monitoring that must remain active when the main window is minimized or hidden. The browser/HTTPS deployment remains the right choice for QR-based phone access.
 
 ## Runtime behavior
 
@@ -81,9 +81,52 @@ Platform-specific commands are also available:
 ```bash
 npm run desktop:dist:win
 npm run desktop:dist:mac
+npm run desktop:dist:linux
 ```
 
-The Windows target is NSIS and the macOS target is DMG. Build and test the Windows installer on Windows and the macOS image on macOS. Output is written to `release/` and is ignored by Git.
+The Windows target is NSIS. macOS produces separate x64 and arm64 DMGs for Intel and Apple Silicon. Linux produces an x64 AppImage for broad distribution and a Debian package for Ubuntu/Debian/Mint. Build and test each artifact on its target operating system; AppImage packaging should run on Linux (or the official builder container), and DMG packaging/signing must run on macOS. Output is written to `release/` and is ignored by Git.
+
+Run an AppImage after making it executable:
+
+```bash
+chmod +x release/VisionGuard-AI-1.0.0-linux-x64.AppImage
+./release/VisionGuard-AI-1.0.0-linux-x64.AppImage
+```
+
+Install the Debian package with the system package manager:
+
+```bash
+sudo apt install ./release/VisionGuard-AI-1.0.0-linux-x64.deb
+```
+
+### Cross-host development archives
+
+When only a Windows build host is available, a portable Linux x64 archive can
+still be delivered. Extract and launch the verified runnable archive on Linux:
+
+```bash
+tar -xzf VisionGuard-AI-1.0.0-linux-x64-runnable.tar.gz
+cd VisionGuard-AI-1.0.0-linux-x64
+./visionguard-ai
+```
+
+The `scripts/fix-linux-tar-permissions.py` post-processing step restores the
+Unix executable and sandbox modes that a Windows-hosted tar operation otherwise
+loses.
+
+Unsigned macOS development archives are supplied separately for Intel (`x64`)
+and Apple Silicon (`arm64`). After extracting the matching zip on a Mac, open
+Terminal in that folder and run:
+
+```bash
+chmod +x INSTALL-macOS.command
+./INSTALL-macOS.command
+```
+
+The included script removes quarantine from that extracted copy, applies an
+ad-hoc local signature with macOS `codesign`, and launches the app. These
+cross-host archives are for local testing only; they have not been executed on
+the Windows build host and do not replace a Developer ID signed/notarized DMG.
 
 The checked-in `build/entitlements.mac.plist` enables Electron's JIT/unsigned executable-memory requirements and camera access for the main app and inherited helper processes. Library-validation disabling is deliberately omitted because this app does not load third-party native plugins; add that broader entitlement only if a reviewed native dependency proves it necessary.
 
@@ -96,7 +139,7 @@ This repository contains the runtime/package skeleton, not production signing cr
 - final `.ico` and `.icns` application/installer artwork (the included SVG is a tray fallback only);
 - camera tests on each target OS, including denial, later re-enabling in system settings, hide/minimize, pause/resume, sleep/wake, force quit, and installer upgrade behavior.
 
-On Windows, camera access can be reviewed under **Settings → Privacy & security → Camera**. On macOS, use **System Settings → Privacy & Security → Camera**. Denial at the OS level cannot be bypassed by the Electron permission handler.
+On Windows, camera access can be reviewed under **Settings > Privacy & security > Camera**. On macOS, use **System Settings > Privacy & Security > Camera**. Linux camera permission and device access vary by distribution and display/session stack; test `/dev/video*` access and any desktop privacy controls on each supported distribution. Denial at the OS level cannot be bypassed by the Electron permission handler.
 
 ## Background limitations
 

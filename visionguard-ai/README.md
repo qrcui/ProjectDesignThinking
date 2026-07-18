@@ -246,10 +246,26 @@ A browser cannot reliably auto-detect physical display dimensions. Standard web 
 
 Recalibrate after changing the display, browser zoom, screen scaling, or display orientation/setup.
 
+## Native application packages
+
+- Windows: `npm run desktop:dist:win` creates the NSIS installer.
+- Android: `npm run android:apk` creates a debug-signed, directly installable
+  APK after JDK 21 and Android SDK 36 are installed.
+- Linux: `npm run desktop:dist:linux` creates AppImage and deb packages.
+- macOS: `npm run desktop:dist:mac` creates separate Intel and Apple Silicon
+  DMGs on macOS.
+
+See [ANDROID.md](ANDROID.md) for Android permissions, signing, and device tests,
+and [DESKTOP.md](DESKTOP.md) for desktop runtime, signing, and packaging details.
+The repository-level `Package applications` GitHub Actions workflow can build
+unsigned/test artifacts on each native host when manually dispatched or when a
+`v*` tag is pushed.
+
 ## Project Structure
 
 ```text
 visionguard-ai/
+├── android/                     # Capacitor Android project and Gradle wrapper
 ├── electron/                    # Secure Electron main/preload, tray asset
 ├── public/
 │   ├── mediapipe/wasm/          # Local MediaPipe WASM
@@ -266,7 +282,8 @@ visionguard-ai/
 │   └── language-typography.css  # English-specific spacing and wrapping
 ├── dist/                        # Validated production build
 ├── serve_dist.py                # Dependency-free local static server
-├── DESKTOP.md                   # Windows/macOS shell and packaging guide
+├── ANDROID.md                   # Android APK, signing, and device-test guide
+├── DESKTOP.md                   # Windows/Linux/macOS packaging guide
 ├── DEPLOYMENT_QR.md             # HTTPS hosting and scan-to-use paths
 ├── VALIDATION.md                # Delivery validation record
 ├── THIRD_PARTY_NOTICES.md

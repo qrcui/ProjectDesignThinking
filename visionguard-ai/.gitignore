@@ -1,6 +1,13 @@
 node_modules
 dist
 release
+android/.gradle
+android/local.properties
+android/keystore.properties
+android/*.jks
+android/*.keystore
+android/app/build
+android/build
 .vite
 .npm-cache
 .DS_Store

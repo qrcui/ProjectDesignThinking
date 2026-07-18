@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "composite": true,
+    "tsBuildInfoFile": ".vite/tsconfig.node.tsbuildinfo",
     "skipLibCheck": true,
     "module": "ESNext",
     "moduleResolution": "Bundler",
@@ -8,6 +9,7 @@
     "noEmit": true
   },
   "include": [
-    "vite.config.ts"
+    "vite.config.ts",
+    "capacitor.config.ts"
   ]
 }

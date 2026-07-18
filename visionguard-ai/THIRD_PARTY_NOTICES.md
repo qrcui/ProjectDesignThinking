@@ -29,6 +29,15 @@ No Nuralogix runtime code is used by this project.
 - Copyright Meta Platforms, Inc. and affiliates.
 - License: MIT.
 
+## Capacitor 8
+
+- Components: `@capacitor/core`, `@capacitor/android`,
+  `@capacitor/filesystem`, `@capacitor/share`, and the development-time CLI.
+- Copyright (c) 2017-present Drifty Co.
+- License: MIT.
+- Use in this project: Android WebView runtime, native project integration, and
+  the system share/save route used for JSON result export.
+
 ## QRCode 1.5.4 (`qrcode`)
 
 - Copyright (c) 2012 Ryan Day.
