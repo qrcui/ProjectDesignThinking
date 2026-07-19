@@ -1,5 +1,7 @@
 # VisionGuard AI
 
+[**English**](README.md) | [简体中文](README.zh-CN.md) | [繁體中文](README.zh-TW.md) | [Repository home](../README.md)
+
 VisionGuard AI is a browser-based visual-acuity screening and digital-eye-strain monitoring MVP. It uses the computer camera to run facial and eye-landmark inference locally, estimates relative viewing distance, counts blinks, reports heuristic fatigue indicators, and guides the user through a Landolt C gap-direction test.
 
 > **Important notice:** This project is intended only for health screening and product demonstrations. It cannot diagnose myopia, astigmatism, eye disease, or any other medical condition, and it is not a substitute for an examination by an optometrist or ophthalmologist. Seek prompt professional medical evaluation for persistent blurred vision, eye pain, double vision, flashes of light, a sudden increase in floaters, or visual-field abnormalities.
@@ -287,6 +289,8 @@ visionguard-ai/
 ├── DEPLOYMENT_QR.md             # HTTPS hosting and scan-to-use paths
 ├── VALIDATION.md                # Delivery validation record
 ├── THIRD_PARTY_NOTICES.md
+├── README.zh-CN.md              # Simplified Chinese documentation
+├── README.zh-TW.md              # Traditional Chinese documentation
 └── README.md
 ```
 
