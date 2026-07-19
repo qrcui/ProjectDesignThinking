@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import type { NormalizedPoint } from '../types';
-import { calculateEyeAspectRatio, estimateDistanceCm } from './vision';
+import {
+  calculateEyeAspectRatio,
+  estimateDistanceCm,
+  extractFaceMeasurement,
+  isCompatibleFrameAspect,
+} from './vision';
 
 function syntheticLandmarks(): NormalizedPoint[] {
   const landmarks = Array.from({ length: 478 }, () => ({ x: 0.5, y: 0.5 }));
@@ -33,5 +38,24 @@ describe('vision calculations', () => {
   it('calculates eye aspect ratio from six landmarks per eye', () => {
     const ear = calculateEyeAspectRatio(syntheticLandmarks(), 1000, 1000);
     expect(ear).toBeCloseTo(0.4, 5);
+  });
+
+  it('keeps the eye-width ratio stable when video resolution scales', () => {
+    const standard = extractFaceMeasurement(syntheticLandmarks(), 640, 480);
+    const doubled = extractFaceMeasurement(syntheticLandmarks(), 1280, 960);
+
+    expect(standard).not.toBeNull();
+    expect(doubled).not.toBeNull();
+    expect(doubled?.eyePixelDistance).toBeCloseTo(
+      (standard?.eyePixelDistance ?? 0) * 2,
+      5,
+    );
+    expect(doubled?.eyeWidthRatio).toBeCloseTo(standard?.eyeWidthRatio ?? 0, 8);
+  });
+
+  it('rejects a rotated or recropped camera frame for an existing calibration', () => {
+    expect(isCompatibleFrameAspect(4 / 3, 4 / 3)).toBe(true);
+    expect(isCompatibleFrameAspect(4 / 3, 16 / 9)).toBe(false);
+    expect(isCompatibleFrameAspect(4 / 3, 3 / 4)).toBe(false);
   });
 });

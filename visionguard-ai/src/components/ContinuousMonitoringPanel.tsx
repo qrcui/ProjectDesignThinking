@@ -14,6 +14,7 @@ import {
 } from '../lib/continuousMonitoring';
 import { readStorage, writeStorage } from '../lib/storage';
 import { detectDesktopMonitoringRuntime } from '../lib/desktopRuntime';
+import { isNativeAppRuntime } from '../lib/appRuntime';
 import type { EngineStatus, RecommendationCode, VisionMetrics } from '../types';
 import '../continuous-monitoring.css';
 
@@ -67,6 +68,15 @@ const noticeMessageKeys: Record<Exclude<MonitoringNotice, null>, MessageKey> = {
   'stream-ended': 'continuous.notice.streamEnded',
   'manual-pause': 'continuous.notice.manualPause',
   'start-error': 'continuous.notice.startError',
+};
+
+const appNoticeMessageKeys: Partial<
+  Record<Exclude<MonitoringNotice, null>, MessageKey>
+> = {
+  'page-hidden': 'continuous.notice.pageHiddenApp',
+  'page-frozen': 'continuous.notice.pageFrozenApp',
+  'page-left': 'continuous.notice.pageLeftApp',
+  'start-error': 'continuous.notice.startErrorApp',
 };
 
 const reasonMessageKeys: Record<ContinuousReportReason, MessageKey> = {
@@ -131,7 +141,7 @@ export function ContinuousMonitoringPanel({
   onStopCamera,
   onExit,
 }: ContinuousMonitoringPanelProps) {
-  const { formatDateTime, formatNumber, t } = useI18n();
+  const { formatDateTime, formatNumber, runtime, t } = useI18n();
   const [desktopRuntime] = useState(detectDesktopMonitoringRuntime);
   const [pageHidden, setPageHidden] = useState(
     () => typeof document !== 'undefined' && document.visibilityState !== 'visible',
@@ -574,7 +584,17 @@ export function ContinuousMonitoringPanel({
     modeStatus === 'active';
   const visibleStatusLabel = desktopBackgroundActive
     ? t('continuous.status.activeDesktopBackground')
-    : t(statusMessageKeys[modeStatus]);
+    : t(
+        modeStatus === 'active' && isNativeAppRuntime(runtime)
+          ? 'continuous.status.activeApp'
+          : statusMessageKeys[modeStatus],
+      );
+  const appRuntime = isNativeAppRuntime(runtime);
+  const visibleNoticeKey = notice
+    ? appRuntime
+      ? appNoticeMessageKeys[notice] ?? noticeMessageKeys[notice]
+      : noticeMessageKeys[notice]
+    : null;
 
   return (
     <section
@@ -587,7 +607,9 @@ export function ContinuousMonitoringPanel({
       <div className="continuous-monitoring__heading">
         <div>
           <span className="eyebrow">{t('continuous.eyebrow')}</span>
-          <h2 id="continuous-monitoring-title">{t('continuous.title')}</h2>
+          <h2 id="continuous-monitoring-title">
+            {t(runtime === 'web' ? 'continuous.title' : 'continuous.titleApp')}
+          </h2>
           <p>{t('continuous.intro')}</p>
         </div>
         <span className={`status-pill status-${modeStatus}`} role="status" aria-live="polite">
@@ -601,6 +623,8 @@ export function ContinuousMonitoringPanel({
           {t(
             desktopRuntime.allowsHiddenWindowMonitoring
               ? 'continuous.boundaryTitleDesktop'
+              : appRuntime
+                ? 'continuous.boundaryTitleApp'
               : 'continuous.boundaryTitle',
           )}
         </strong>
@@ -608,15 +632,17 @@ export function ContinuousMonitoringPanel({
           {t(
             desktopRuntime.allowsHiddenWindowMonitoring
               ? 'continuous.boundaryBodyDesktop'
+              : appRuntime
+                ? 'continuous.boundaryBodyApp'
               : 'continuous.boundaryBody',
           )}
         </span>
       </aside>
 
-      {notice && (
+      {notice && visibleNoticeKey && (
         <div className="inline-alert continuous-monitoring__notice" role="alert">
           <strong>{t('continuous.interruptionTitle')}</strong>
-          <span>{t(noticeMessageKeys[notice])}</span>
+          <span>{t(visibleNoticeKey)}</span>
         </div>
       )}
 
@@ -690,8 +716,12 @@ export function ContinuousMonitoringPanel({
       <p className="continuous-monitoring__privacy">
         {t(
           persistenceConsent
-            ? 'continuous.persistenceOn'
-            : 'continuous.persistenceOff',
+            ? runtime === 'web'
+              ? 'continuous.persistenceOn'
+              : 'continuous.persistenceOnApp'
+            : runtime === 'web'
+              ? 'continuous.persistenceOff'
+              : 'continuous.persistenceOffApp',
         )}
       </p>
 

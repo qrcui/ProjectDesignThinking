@@ -19,7 +19,11 @@ import type {
 } from '../types';
 import { calculateBlinkRate, calculateFatigueScore, fatigueBand } from '../lib/fatigue';
 import { median, percentile, roundTo } from '../lib/geometry';
-import { estimateDistanceCm, extractFaceMeasurement } from '../lib/vision';
+import {
+  estimateDistanceCm,
+  extractFaceMeasurement,
+  isCompatibleFrameAspect,
+} from '../lib/vision';
 
 const EMPTY_METRICS: VisionMetrics = {
   faceDetected: false,
@@ -44,7 +48,9 @@ const EMPTY_METRICS: VisionMetrics = {
 interface CalibrationCollector {
   activeStartedAt: number | null;
   elapsedMs: number;
-  samples: number[];
+  eyePixelSamples: number[];
+  eyeWidthRatioSamples: number[];
+  referenceFrameAspectRatio: number | null;
   referenceDistanceCm: number;
 }
 
@@ -176,6 +182,7 @@ export function useVisionEngine(): UseVisionEngineReturn {
   const eyesClosedRef = useRef(false);
   const earSamplesRef = useRef<number[]>([]);
   const frameTimesRef = useRef<number[]>([]);
+  const distanceSamplesRef = useRef<number[]>([]);
   const lightingCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const lastLightingSampleAtRef = useRef(Number.NEGATIVE_INFINITY);
   const lightingLevelRef = useRef<number | null>(null);
@@ -216,6 +223,7 @@ export function useVisionEngine(): UseVisionEngineReturn {
     eyesClosedRef.current = false;
     earSamplesRef.current = [];
     frameTimesRef.current = [];
+    distanceSamplesRef.current = [];
     lastLightingSampleAtRef.current = Number.NEGATIVE_INFINITY;
     lightingLevelRef.current = null;
     lightingOkRef.current = false;
@@ -224,8 +232,49 @@ export function useVisionEngine(): UseVisionEngineReturn {
 
   const clearDistanceCalibration = useCallback(() => {
     distanceCalibrationRef.current = null;
+    distanceSamplesRef.current = [];
     setDistanceCalibration(null);
   }, []);
+
+  const invalidateDistanceCalibrationForFrameChange = useCallback(() => {
+    if (!distanceCalibrationRef.current && !calibrationCollectorRef.current) return;
+    clearDistanceCalibration();
+    calibrationCollectorRef.current = null;
+    setIsDistanceCalibrating(false);
+    setCalibrationProgress(0);
+    setCalibrationMessage('camera-frame-changed');
+  }, [clearDistanceCalibration]);
+
+  useEffect(() => {
+    const handleOrientationChange = () => invalidateDistanceCalibrationForFrameChange();
+    const handleVideoResize = () => {
+      const calibration = distanceCalibrationRef.current;
+      const video = videoRef.current;
+      if (!calibration || !video || video.videoWidth <= 0 || video.videoHeight <= 0) {
+        return;
+      }
+      const currentAspectRatio = video.videoWidth / video.videoHeight;
+      if (
+        !isCompatibleFrameAspect(
+          calibration.referenceFrameAspectRatio,
+          currentAspectRatio,
+        )
+      ) {
+        invalidateDistanceCalibrationForFrameChange();
+      }
+    };
+
+    const orientation = window.screen.orientation;
+    const video = videoRef.current;
+    orientation?.addEventListener('change', handleOrientationChange);
+    window.addEventListener('orientationchange', handleOrientationChange);
+    video?.addEventListener('resize', handleVideoResize);
+    return () => {
+      orientation?.removeEventListener('change', handleOrientationChange);
+      window.removeEventListener('orientationchange', handleOrientationChange);
+      video?.removeEventListener('resize', handleVideoResize);
+    };
+  }, [invalidateDistanceCalibrationForFrameChange]);
 
   const stopLoopsAndStream = useCallback(() => {
     runtimeGenerationRef.current += 1;
@@ -274,7 +323,13 @@ export function useVisionEngine(): UseVisionEngineReturn {
     }
   }, []);
 
-  const finishCalibrationIfReady = useCallback((now: number, eyePixelDistance: number | null, poseOk: boolean) => {
+  const finishCalibrationIfReady = useCallback((
+    now: number,
+    eyePixelDistance: number | null,
+    eyeWidthRatio: number | null,
+    frameAspectRatio: number | null,
+    poseOk: boolean,
+  ) => {
     const collector = calibrationCollectorRef.current;
     if (!collector) return;
 
@@ -282,16 +337,45 @@ export function useVisionEngine(): UseVisionEngineReturn {
       collector.elapsedMs +
       (collector.activeStartedAt === null ? 0 : now - collector.activeStartedAt);
     setCalibrationProgress(Math.min(100, Math.round((elapsed / 2200) * 100)));
-    if (poseOk && eyePixelDistance !== null && Number.isFinite(eyePixelDistance)) {
-      collector.samples.push(eyePixelDistance);
+    if (
+      poseOk &&
+      lightingOkRef.current &&
+      eyePixelDistance !== null &&
+      eyeWidthRatio !== null &&
+      frameAspectRatio !== null &&
+      Number.isFinite(eyePixelDistance) &&
+      Number.isFinite(eyeWidthRatio)
+    ) {
+      if (collector.referenceFrameAspectRatio === null) {
+        collector.referenceFrameAspectRatio = frameAspectRatio;
+      } else if (
+        !isCompatibleFrameAspect(
+          collector.referenceFrameAspectRatio,
+          frameAspectRatio,
+        )
+      ) {
+        invalidateDistanceCalibrationForFrameChange();
+        return;
+      }
+      collector.eyePixelSamples.push(eyePixelDistance);
+      collector.eyeWidthRatioSamples.push(eyeWidthRatio);
     }
 
     if (elapsed < 2200) return;
-    if (collector.samples.length >= 8) {
-      const referenceEyePx = median(collector.samples);
-      if (referenceEyePx !== null) {
+    if (
+      collector.eyeWidthRatioSamples.length >= 8 &&
+      collector.referenceFrameAspectRatio !== null
+    ) {
+      const referenceEyePx = median(collector.eyePixelSamples);
+      const referenceEyeWidthRatio = median(collector.eyeWidthRatioSamples);
+      if (referenceEyePx !== null && referenceEyeWidthRatio !== null) {
         const calibration: DistanceCalibration = {
           referenceEyePx: roundTo(referenceEyePx, 2),
+          referenceEyeWidthRatio: roundTo(referenceEyeWidthRatio, 6),
+          referenceFrameAspectRatio: roundTo(
+            collector.referenceFrameAspectRatio,
+            6,
+          ),
           referenceDistanceCm: collector.referenceDistanceCm,
           calibratedAt: new Date().toISOString(),
         };
@@ -306,7 +390,7 @@ export function useVisionEngine(): UseVisionEngineReturn {
     calibrationCollectorRef.current = null;
     setIsDistanceCalibrating(false);
     setCalibrationProgress(100);
-  }, []);
+  }, [invalidateDistanceCalibrationForFrameChange]);
 
   const sampleLighting = useCallback((video: HTMLVideoElement, now: number) => {
     if (now - lastLightingSampleAtRef.current < LIGHTING_SAMPLE_INTERVAL_MS) return;
@@ -361,16 +445,38 @@ export function useVisionEngine(): UseVisionEngineReturn {
       const measurement = extractFaceMeasurement(landmarks, width, height);
       if (!measurement) return false;
 
-      finishCalibrationIfReady(now, measurement.eyePixelDistance, measurement.poseOk);
+      finishCalibrationIfReady(
+        now,
+        measurement.eyePixelDistance,
+        measurement.eyeWidthRatio,
+        measurement.frameAspectRatio,
+        measurement.poseOk,
+      );
 
       const calibration = distanceCalibrationRef.current;
-      const estimatedDistance = calibration
-        ? estimateDistanceCm(
-            calibration.referenceEyePx,
-            calibration.referenceDistanceCm,
-            measurement.eyePixelDistance,
-          )
-        : null;
+      let estimatedDistance: number | null = null;
+      if (
+        calibration &&
+        !isCompatibleFrameAspect(
+          calibration.referenceFrameAspectRatio,
+          measurement.frameAspectRatio,
+        )
+      ) {
+        invalidateDistanceCalibrationForFrameChange();
+      } else if (calibration && measurement.poseOk && lightingOkRef.current) {
+        const currentDistance = estimateDistanceCm(
+          calibration.referenceEyeWidthRatio,
+          calibration.referenceDistanceCm,
+          measurement.eyeWidthRatio,
+        );
+        if (currentDistance !== null) {
+          distanceSamplesRef.current.push(currentDistance);
+          if (distanceSamplesRef.current.length > 7) distanceSamplesRef.current.shift();
+          estimatedDistance = median(distanceSamplesRef.current);
+        }
+      } else {
+        distanceSamplesRef.current = [];
+      }
 
       const previousTrackedAt = lastTrackedAtRef.current;
       const frameDelta = previousTrackedAt === null ? 0 : Math.min(now - previousTrackedAt, 500);
@@ -432,12 +538,13 @@ export function useVisionEngine(): UseVisionEngineReturn {
       });
       return true;
     },
-    [finishCalibrationIfReady],
+    [finishCalibrationIfReady, invalidateDistanceCalibrationForFrameChange],
   );
 
   const updateForMissingFace = useCallback(
     (now: number, modelFps: number) => {
-      finishCalibrationIfReady(now, null, false);
+      finishCalibrationIfReady(now, null, null, null, false);
+      distanceSamplesRef.current = [];
       lastTrackedAtRef.current = null;
       closedStartedAtRef.current = null;
       eyesClosedRef.current = false;
@@ -652,6 +759,8 @@ export function useVisionEngine(): UseVisionEngineReturn {
     setCalibrationProgress(0);
     const demoCalibration: DistanceCalibration = {
       referenceEyePx: 120,
+      referenceEyeWidthRatio: 0.1875,
+      referenceFrameAspectRatio: 4 / 3,
       referenceDistanceCm: TARGET_DISTANCE_CM,
       calibratedAt: 'demo',
     };
@@ -800,20 +909,30 @@ export function useVisionEngine(): UseVisionEngineReturn {
       setCalibrationProgress(100);
       return;
     }
-    if (status !== 'running' || !metrics.faceDetected || !metrics.poseOk) {
+    if (status !== 'running') {
       setCalibrationMessage('start-camera');
+      return;
+    }
+    if (!metrics.faceDetected || !metrics.poseOk) {
+      setCalibrationMessage('face-not-ready');
+      return;
+    }
+    if (!metrics.lightingOk) {
+      setCalibrationMessage('lighting-not-ready');
       return;
     }
     calibrationCollectorRef.current = {
       activeStartedAt: performance.now(),
       elapsedMs: 0,
-      samples: [],
+      eyePixelSamples: [],
+      eyeWidthRatioSamples: [],
+      referenceFrameAspectRatio: null,
       referenceDistanceCm,
     };
     setCalibrationProgress(0);
     setCalibrationMessage('hold-still');
     setIsDistanceCalibrating(true);
-  }, [metrics.faceDetected, metrics.poseOk, status]);
+  }, [metrics.faceDetected, metrics.lightingOk, metrics.poseOk, status]);
 
   const resetDistanceCalibration = useCallback(() => {
     clearDistanceCalibration();

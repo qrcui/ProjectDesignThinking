@@ -47,6 +47,7 @@ import {
   visionMetricsFromSnapshot,
 } from './lib/resultSnapshot';
 import { normalizeScreenCalibration } from './lib/screenCalibration';
+import { resolvePostConsentDestination } from './lib/onboarding';
 import './app.css';
 import './enhancements.css';
 import './language-typography.css';
@@ -146,6 +147,8 @@ export default function App() {
   const [journeyElapsedSeconds, setJourneyElapsedSeconds] = useState(0);
   const [guidanceEngaged, setGuidanceEngaged] = useState(false);
   const [privacyStatus, setPrivacyStatus] = useState<MessageKey | null>(null);
+  const [awaitingCameraForCalibration, setAwaitingCameraForCalibration] =
+    useState(false);
   const [monitoringResetSignal, setMonitoringResetSignal] = useState(0);
   const [resultSessionContexts, setResultSessionContexts] = useState<
     Record<string, ResultSessionContext>
@@ -183,6 +186,16 @@ export default function App() {
     }, 1000);
     return () => window.clearInterval(timer);
   }, [journeyStartedAt]);
+
+  useEffect(() => {
+    if (!awaitingCameraForCalibration || engine.status !== 'running') return;
+    setAwaitingCameraForCalibration(false);
+    window.setTimeout(() => {
+      document
+        .getElementById('calibration')
+        ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 0);
+  }, [awaitingCameraForCalibration, engine.status]);
 
   const saveScreenCalibration = (calibration: ScreenCalibration) => {
     setScreenCalibration(calibration);
@@ -248,8 +261,15 @@ export default function App() {
       setRetestDueAt(null);
     }
     setPrivacyStatus('consent.saved');
+    const destination = resolvePostConsentDestination(
+      engine.status,
+      engine.distanceCalibration !== null,
+    );
+    setAwaitingCameraForCalibration(destination === 'camera');
     window.setTimeout(() => {
-      document.getElementById('calibration')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      document
+        .getElementById(destination === 'camera' ? 'camera-monitoring' : 'calibration')
+        ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }, 0);
   };
 
@@ -257,6 +277,7 @@ export default function App() {
     setCameraConsent(consented);
     setPrivacyStatus(null);
     if (!consented) {
+      setAwaitingCameraForCalibration(false);
       engine.stopCamera();
       setSavedConsent((current) => {
         const next = { ...current, camera: false };
@@ -289,9 +310,15 @@ export default function App() {
     await engine.startCamera();
   };
 
+  const stopCameraAndCancelCalibrationHandoff = () => {
+    setAwaitingCameraForCalibration(false);
+    engine.stopCamera();
+  };
+
   const deleteLocalScreeningData = () => {
     if (!window.confirm(t('privacy.deleteConfirm'))) return;
     engine.stopCamera();
+    setAwaitingCameraForCalibration(false);
     engine.resetDistanceCalibration();
     setResults([]);
     setResultSessionContexts({});
@@ -317,6 +344,7 @@ export default function App() {
 
   const exitCurrentSession = () => {
     engine.stopCamera();
+    setAwaitingCameraForCalibration(false);
     setSymptoms([]);
     setSymptomsComplete(false);
     setGuidanceEngaged(false);
@@ -791,7 +819,11 @@ export default function App() {
           </div>
         </section>
 
-        <section className="dashboard-grid" aria-label={t('dashboard.aria')}>
+        <section
+          className="dashboard-grid"
+          id="camera-monitoring"
+          aria-label={t('dashboard.aria')}
+        >
           <CameraPanel
             videoRef={engine.videoRef}
             status={engine.status}
@@ -800,7 +832,7 @@ export default function App() {
             onStart={startCameraWithConsent}
             onPause={engine.pauseMonitoring}
             onResume={engine.resumeMonitoring}
-            onStop={engine.stopCamera}
+            onStop={stopCameraAndCancelCalibrationHandoff}
             onExit={exitCurrentSession}
             onDemo={engine.enableDemo}
           />
@@ -828,7 +860,7 @@ export default function App() {
           onStartCamera={startCameraWithConsent}
           onPauseCamera={engine.pauseMonitoring}
           onResumeCamera={engine.resumeMonitoring}
-          onStopCamera={engine.stopCamera}
+          onStopCamera={stopCameraAndCancelCalibrationHandoff}
           onExit={exitCurrentSession}
         />
 
@@ -863,7 +895,7 @@ export default function App() {
           symptomsComplete={symptomsComplete}
           onPauseMonitoring={engine.pauseMonitoring}
           onResumeMonitoring={engine.resumeMonitoring}
-          onStopMonitoring={engine.stopCamera}
+          onStopMonitoring={stopCameraAndCancelCalibrationHandoff}
           onComplete={saveResult}
         />
 

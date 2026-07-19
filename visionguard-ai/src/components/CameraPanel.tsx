@@ -7,6 +7,7 @@ import type {
   VisionEngineErrorCode,
   VisionMetrics,
 } from '../types';
+import { isNativeAppRuntime } from '../lib/appRuntime';
 
 interface CameraPanelProps {
   videoRef: RefObject<HTMLVideoElement>;
@@ -77,13 +78,36 @@ export function CameraPanel({
   onExit,
   onDemo,
 }: CameraPanelProps) {
-  const { t } = useI18n();
+  const { runtime, t } = useI18n();
   const active = status === 'running' || status === 'demo';
   const loading = status === 'requesting-camera' || status === 'loading-model';
   const cameraFeedVisible = status === 'loading-model' || status === 'running';
   const stageActive = active || cameraFeedVisible;
   const sessionControllable = active || loading || status === 'paused';
-  const errorMessages = error ? errorMessageKeys[error.code] : null;
+  const baseErrorMessages = error ? errorMessageKeys[error.code] : null;
+  const errorMessages = baseErrorMessages && error
+    ? {
+        ...baseErrorMessages,
+        detail:
+          error.code === 'camera-blocked'
+            ? runtime === 'desktop'
+              ? 'camera.error.blockedDetailDesktop'
+              : isNativeAppRuntime(runtime)
+                ? 'camera.error.blockedDetailApp'
+                : baseErrorMessages.detail
+            : error.code === 'camera-unavailable'
+              ? runtime === 'desktop'
+                ? 'camera.error.unavailableDetailDesktop'
+                : isNativeAppRuntime(runtime)
+                  ? 'camera.error.unavailableDetailApp'
+                  : baseErrorMessages.detail
+              : error.code === 'model-load-failed' && runtime !== 'web'
+                ? 'camera.error.modelDetailApp'
+                : error.code === 'engine-failed' && runtime !== 'web'
+                  ? 'camera.error.genericDetailApp'
+                  : baseErrorMessages.detail,
+      }
+    : null;
 
   return (
     <section className="panel camera-panel" aria-labelledby="camera-title">

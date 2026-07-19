@@ -45,6 +45,14 @@ describe('screen calibration', () => {
     expect(estimateScreenCalibrationFromDiagonal(15.6, 0, 1080, 'now')).toBeNull();
   });
 
+  it('is invariant when portrait and landscape screen axes are swapped', () => {
+    const portrait = estimateScreenCalibrationFromDiagonal(6.7, 393, 873, 'now');
+    const landscape = estimateScreenCalibrationFromDiagonal(6.7, 873, 393, 'now');
+
+    expect(portrait).not.toBeNull();
+    expect(landscape?.pxPerMm).toBeCloseTo(portrait?.pxPerMm ?? 0, 10);
+  });
+
   it('upgrades a legacy card calibration without changing its result', () => {
     const legacy = {
       cardWidthPx: 350,

@@ -214,13 +214,13 @@ An Electron desktop shell may expose the narrow preload contract `window.desktop
 
 ### Relative Distance
 
-At the 60 cm reference position, the pixel distance `P_ref` between the outer eye corners is recorded. For a later measurement `P_now`:
+At the 60 cm reference position, the outer-eye-corner span is divided by the intrinsic camera-frame width to form the resolution-independent ratio `R_ref`. For a later ratio `R_now`:
 
 ```text
-D_now = D_ref × P_ref / P_now
+D_now = D_ref × R_ref / R_now
 ```
 
-This relative estimate assumes that camera focal length, digital zoom, and facial conditions remain stable during the session. It is not a substitute for a depth camera or calibrated distance device.
+The app publishes this estimate only while face pose and lighting are acceptable and smooths the latest valid samples with a rolling median. A change in camera-frame orientation or aspect ratio invalidates the baseline and requires recalibration. The estimate still assumes that focal length, digital zoom, crop, and facial conditions remain stable; it is not a substitute for a depth camera or calibrated distance device.
 
 ### Blinks
 
@@ -240,7 +240,7 @@ It has no clinical diagnostic meaning. Monitoring initially displays a collectin
 
 Physical-reference calibration determines CSS pixels per millimeter from either an ISO/IEC 7810 ID-1 outline (85.60 × 53.98 mm) or an ICAO TD-3 machine-readable passport outline (125 × 88 mm). Identity and student cards vary across countries and issuers, so the card option must be used only with an item known to conform to ID-1. The Landolt C height uses the 5-arcminute visual angle for the target Snellen level and is converted to screen pixels.
 
-The no-object option asks the user for the physical screen diagonal in inches and combines it with `window.screen.width` and `window.screen.height` to estimate CSS pixels per millimeter. It is intentionally labelled approximate. System scaling, browser zoom, moving the window between displays, and an incorrect device specification can all affect the result.
+The no-object option requires the user to enter the physical diagonal of the current device and combines it with `window.screen.width` and `window.screen.height` to estimate logical screen pixels per millimeter. No laptop-sized value is prefilled on a phone. Swapping portrait and landscape axes does not change the diagonal calculation, but system/interface scaling, moving between displays, and an incorrect device specification can affect the result.
 
 A browser cannot reliably auto-detect physical display dimensions. Standard web APIs expose CSS-pixel dimensions, but not a trustworthy physical panel width/height or monitor EDID. Likewise, ordinary `getUserMedia()` camera metadata does not provide the calibrated sensor size, focal length, and scene scale needed to recover absolute dimensions from a single monocular image. Camera resolution or `devicePixelRatio` alone is therefore not a valid substitute for calibration. A native application with permission to read display hardware metadata, a depth/AR API, or a known object in view could offer stronger device-specific calibration, but this browser MVP does not claim that precision.
 

@@ -16,8 +16,13 @@ import {
   type TranslationParams,
 } from './messages';
 import { resolveInitialLocale } from './locale';
+import {
+  detectAppRuntime,
+  type AppRuntime,
+} from '../lib/appRuntime';
 
 interface I18nContextValue {
+  runtime: AppRuntime;
   locale: Locale;
   setLocale: (locale: Locale) => void;
   t: (key: MessageKey, params?: TranslationParams) => string;
@@ -49,6 +54,7 @@ function initialLocale(): Locale {
 }
 
 export function I18nProvider({ children }: { children: ReactNode }) {
+  const [runtime] = useState<AppRuntime>(() => detectAppRuntime());
   const [locale, setLocale] = useState<Locale>(initialLocale);
 
   const t = useCallback(
@@ -93,8 +99,8 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   }, [locale]);
 
   const value = useMemo<I18nContextValue>(
-    () => ({ locale, setLocale, t, plural, formatNumber, formatDateTime }),
-    [formatDateTime, formatNumber, locale, plural, t],
+    () => ({ runtime, locale, setLocale, t, plural, formatNumber, formatDateTime }),
+    [formatDateTime, formatNumber, locale, plural, runtime, t],
   );
 
   return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;

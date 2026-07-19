@@ -22,6 +22,9 @@ export type CalibrationMessageCode =
   | 'not-enough-samples'
   | 'demo'
   | 'start-camera'
+  | 'face-not-ready'
+  | 'lighting-not-ready'
+  | 'camera-frame-changed'
   | 'hold-still'
   | 'cleared';
 export type RecommendationCode =
@@ -42,6 +45,10 @@ export interface NormalizedPoint {
 
 export interface DistanceCalibration {
   referenceEyePx: number;
+  /** Eye span divided by intrinsic video width, independent of resolution. */
+  referenceEyeWidthRatio: number;
+  /** Intrinsic video width/height ratio used to detect rotation or recropping. */
+  referenceFrameAspectRatio: number;
   referenceDistanceCm: number;
   calibratedAt: string;
 }
@@ -71,6 +78,8 @@ export interface ScreenCalibration {
 
 export interface FaceMeasurement {
   eyePixelDistance: number;
+  eyeWidthRatio: number;
+  frameAspectRatio: number;
   eyeAspectRatio: number;
   poseOk: boolean;
   centered: boolean;

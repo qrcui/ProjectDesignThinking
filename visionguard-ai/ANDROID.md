@@ -86,6 +86,18 @@ asks for camera access only after the in-app consent flow calls
 `getUserMedia()`. Cleartext HTTP is disabled and application data backup is
 disabled because opted-in derived screening history may be stored locally.
 
+For an uncalibrated first run, confirming the purpose statement scrolls to the
+camera panel. The user must start the real camera manually; only after the
+engine reaches its running state does the interface continue to calibration.
+An already-running camera session goes directly to calibration, while demo,
+loading, paused, denied, and error states do not count as camera readiness.
+
+Distance calibration uses eye span relative to intrinsic camera-frame width,
+not raw video pixels or the screen-size calibration. Rotating the device or
+changing the camera crop/aspect ratio invalidates the distance baseline and
+asks for recalibration. The screen-diagonal method controls optotype display
+size only; enter the phone's actual diagonal, not a laptop value.
+
 Continuous monitoring on Android remains a foreground feature. Locking the
 screen, switching applications, the OS suspending the WebView, or closing the
 app interrupts monitoring; the APK is not a hidden camera service.
@@ -96,10 +108,11 @@ Test at least one real phone as well as an emulator:
 
 1. first-run consent and camera allow/deny;
 2. denial recovery through Android Settings;
-3. front-camera selection, portrait/landscape rotation, safe areas, and the
-   software keyboard;
-4. local Face Landmarker/WASM loading while offline;
-5. pause/resume and interruption when the app moves to the background;
-6. result persistence, JSON export through the Android share/save sheet, and
+3. distance checks against a ruler at 40/60/80 cm in portrait and landscape,
+   including recalibration after rotation;
+4. front-camera selection, safe areas, and the software keyboard;
+5. local Face Landmarker/WASM loading while offline;
+6. pause/resume and interruption when the app moves to the background;
+7. result persistence, JSON export through the Android share/save sheet, and
    local-data deletion;
-7. upgrade install over an earlier APK with the same application ID.
+8. upgrade install over an earlier APK with the same application ID.

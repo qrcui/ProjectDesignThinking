@@ -33,12 +33,45 @@ export function calculateEyeAspectRatio(
 }
 
 export function estimateDistanceCm(
-  referenceEyePx: number,
+  referenceEyeSpan: number,
   referenceDistanceCm: number,
-  currentEyePx: number,
+  currentEyeSpan: number,
 ): number | null {
-  if (referenceEyePx <= 0 || referenceDistanceCm <= 0 || currentEyePx <= 0) return null;
-  return (referenceEyePx * referenceDistanceCm) / currentEyePx;
+  if (referenceEyeSpan <= 0 || referenceDistanceCm <= 0 || currentEyeSpan <= 0) {
+    return null;
+  }
+  return (referenceEyeSpan * referenceDistanceCm) / currentEyeSpan;
+}
+
+export function calculateEyeWidthRatio(
+  eyePixelDistance: number,
+  frameWidth: number,
+): number | null {
+  if (eyePixelDistance <= 0 || frameWidth <= 0) return null;
+  return eyePixelDistance / frameWidth;
+}
+
+export function calculateFrameAspectRatio(width: number, height: number): number | null {
+  if (width <= 0 || height <= 0) return null;
+  return width / height;
+}
+
+export function isCompatibleFrameAspect(
+  referenceAspectRatio: number,
+  currentAspectRatio: number,
+  relativeTolerance = 0.025,
+): boolean {
+  if (
+    referenceAspectRatio <= 0 ||
+    currentAspectRatio <= 0 ||
+    relativeTolerance < 0
+  ) {
+    return false;
+  }
+  return (
+    Math.abs(currentAspectRatio - referenceAspectRatio) / referenceAspectRatio <=
+    relativeTolerance
+  );
 }
 
 export function extractFaceMeasurement(
@@ -53,6 +86,9 @@ export function extractFaceMeasurement(
 
   const eyePixelDistance = distance2d(leftEye, rightEye, width, height);
   if (eyePixelDistance < 4) return null;
+  const eyeWidthRatio = calculateEyeWidthRatio(eyePixelDistance, width);
+  const frameAspectRatio = calculateFrameAspectRatio(width, height);
+  if (eyeWidthRatio === null || frameAspectRatio === null) return null;
 
   const eyeAspectRatioValue = calculateEyeAspectRatio(landmarks, width, height);
   const eyeCenterX = (leftEye.x + rightEye.x) / 2;
@@ -69,6 +105,8 @@ export function extractFaceMeasurement(
 
   return {
     eyePixelDistance,
+    eyeWidthRatio,
+    frameAspectRatio,
     eyeAspectRatio: eyeAspectRatioValue,
     poseOk: centered && level && facingForward,
     centered,

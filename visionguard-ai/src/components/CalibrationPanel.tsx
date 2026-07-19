@@ -51,7 +51,7 @@ export function CalibrationPanel({
     screenCalibration.cardWidthPx,
   );
   const [draftDiagonalInches, setDraftDiagonalInches] = useState(() =>
-    String(screenCalibration.screenDiagonalInches ?? 15.6),
+    String(screenCalibration.screenDiagonalInches ?? ''),
   );
 
   const calibrationMessageKeys: Record<CalibrationMessageCode, MessageKey> = {
@@ -59,6 +59,9 @@ export function CalibrationPanel({
     'not-enough-samples': 'calibration.message.notEnough',
     demo: 'calibration.message.demo',
     'start-camera': 'calibration.message.startCamera',
+    'face-not-ready': 'calibration.message.faceNotReady',
+    'lighting-not-ready': 'calibration.message.lightingNotReady',
+    'camera-frame-changed': 'calibration.message.cameraFrameChanged',
     'hold-still': 'calibration.message.holdStill',
     cleared: 'calibration.message.cleared',
   };
@@ -66,9 +69,7 @@ export function CalibrationPanel({
   useEffect(() => {
     setReferenceType(getCalibrationReferenceType(screenCalibration));
     setDraftReferenceWidth(screenCalibration.cardWidthPx);
-    if (screenCalibration.screenDiagonalInches) {
-      setDraftDiagonalInches(String(screenCalibration.screenDiagonalInches));
-    }
+    setDraftDiagonalInches(String(screenCalibration.screenDiagonalInches ?? ''));
   }, [screenCalibration]);
 
   const isPhysicalReference = referenceType !== 'screen-diagonal';
@@ -289,6 +290,7 @@ export function CalibrationPanel({
                     max="120"
                     step="0.1"
                     inputMode="decimal"
+                    placeholder={t('calibration.diagonalPlaceholder')}
                     value={draftDiagonalInches}
                     onChange={(event) => setDraftDiagonalInches(event.target.value)}
                   />

@@ -651,6 +651,10 @@ main {
   margin: 0 auto;
 }
 
+#camera-monitoring {
+  scroll-margin-top: 100px;
+}
+
 .panel {
   border: 1px solid var(--line);
   border-radius: var(--radius-lg);
