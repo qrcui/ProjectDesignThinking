@@ -1,0 +1,48 @@
+# Local IDE and agent state
+.idea/
+.agents/
+.vscode/
+*.iml
+
+# Operating-system metadata
+.DS_Store
+Thumbs.db
+
+# Node.js, Vite, and test caches
+visionguard-ai/node_modules/
+visionguard-ai/dist/
+visionguard-ai/release/
+visionguard-ai/.vite/
+visionguard-ai/.npm-cache/
+visionguard-ai/coverage/
+*.tsbuildinfo
+*.log
+
+# Python caches
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Android and Capacitor generated files
+visionguard-ai/android/.gradle/
+visionguard-ai/android/build/
+visionguard-ai/android/app/build/
+visionguard-ai/android/local.properties
+visionguard-ai/android/keystore.properties
+visionguard-ai/android/*.jks
+visionguard-ai/android/*.keystore
+visionguard-ai/android/.kotlin/
+visionguard-ai/android/capacitor-cordova-android-plugins/
+visionguard-ai/android/app/src/main/assets/public/
+visionguard-ai/android/app/src/main/assets/capacitor.config.json
+visionguard-ai/android/app/src/main/assets/capacitor.plugins.json
+visionguard-ai/android/app/src/main/res/xml/config.xml
+*.apk
+*.aab
+*.aar
+*.ap_
+*.dex
+*.class
+
+# Generated MediaPipe runtime assets
+visionguard-ai/public/mediapipe/wasm/
