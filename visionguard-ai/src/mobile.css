@@ -17,7 +17,10 @@ body,
   button,
   select,
   input[type="checkbox"],
-  input[type="radio"] {
+  input[type="radio"],
+  .download-menu summary,
+  .download-menu__target,
+  .download-menu__all-releases {
     min-height: 44px;
   }
 
@@ -52,6 +55,10 @@ body,
     gap: 8px;
   }
 
+  .brand > span:last-child {
+    display: none;
+  }
+
   .brand-mark {
     width: 32px;
     height: 23px;
@@ -68,6 +75,10 @@ body,
   .language-picker select {
     min-width: 88px;
     min-height: 44px;
+  }
+
+  .download-menu__grid {
+    grid-template-columns: 1fr;
   }
 
   main {
@@ -305,8 +316,8 @@ body,
 /* A phone held sideways has enough width for side-by-side work but very little height. */
 @media (orientation: landscape) and (max-height: 520px) and (max-width: 950px) {
   .site-header {
-    position: relative;
-    top: auto;
+    position: sticky;
+    top: max(5px, env(safe-area-inset-top));
     width: auto;
     margin: max(5px, env(safe-area-inset-top)) max(8px, env(safe-area-inset-right)) 0
       max(8px, env(safe-area-inset-left));

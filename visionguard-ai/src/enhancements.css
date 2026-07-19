@@ -778,6 +778,35 @@ main > .vg-campaign-access {
   margin-left: 0;
 }
 
+.vg-campus-card__link-detail {
+  min-width: 0;
+  padding: 14px 15px;
+  border: 1px solid rgba(169, 224, 218, 0.15);
+  border-radius: 12px;
+  background: rgba(3, 16, 21, 0.34);
+}
+
+.vg-campus-card__link-detail > span {
+  display: block;
+  margin-bottom: 7px;
+  color: #88aaa7;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.vg-campus-card__link-detail code {
+  display: block;
+  overflow: hidden;
+  color: #f4fbf9;
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: 0.74rem;
+  font-weight: 700;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
 .vg-campus-card__qr {
   display: grid;
   width: 164px;
@@ -833,6 +862,8 @@ main > .vg-campaign-access {
 .vg-campus-card > small {
   position: relative;
   z-index: 1;
+  display: block;
+  margin-top: 18px;
   color: #91afac;
   font-size: 0.68rem;
   line-height: 1.45;

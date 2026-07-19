@@ -22,7 +22,8 @@ import {
   type SymptomChoice,
   type SymptomsPanelCopy,
 } from './components/SymptomsPanel';
-import { CampaignAccess, type CampaignAccessCopy } from './components/CampaignAccess';
+import { UserSupport, type UserSupportCopy } from './components/UserSupport';
+import { DownloadAppsMenu, type DownloadAppsMenuCopy } from './components/DownloadAppsMenu';
 import {
   SYMPTOM_CODES,
   assessScreeningRisk,
@@ -127,7 +128,7 @@ function isSymptomCode(value: string): value is SymptomCode {
 }
 
 export default function App() {
-  const { formatDateTime, formatNumber, locale, plural, setLocale, t } = useI18n();
+  const { formatDateTime, formatNumber, locale, plural, runtime, setLocale, t } = useI18n();
   const engine = useVisionEngine();
   const campaignConfig = useMemo(
     () =>
@@ -467,7 +468,26 @@ export default function App() {
     editLabel: t('symptoms.edit'),
   };
 
-  const campaignCopy: CampaignAccessCopy = {
+  const downloadAppsCopy: DownloadAppsMenuCopy = {
+    triggerLabel: t('downloads.trigger'),
+    menuAriaLabel: t('downloads.menuAria'),
+    title: t('downloads.title'),
+    introduction: t('downloads.intro'),
+    androidLabel: t('downloads.android'),
+    androidDetail: t('downloads.androidDetail'),
+    windowsLabel: t('downloads.windows'),
+    windowsDetail: t('downloads.windowsDetail'),
+    linuxLabel: t('downloads.linux'),
+    linuxDetail: t('downloads.linuxDetail'),
+    macArmLabel: t('downloads.macArm'),
+    macArmDetail: t('downloads.macArmDetail'),
+    macIntelLabel: t('downloads.macIntel'),
+    macIntelDetail: t('downloads.macIntelDetail'),
+    previewNotice: t('downloads.previewNotice'),
+    allReleasesLabel: t('downloads.allReleases'),
+  };
+
+  const userSupportCopy: UserSupportCopy = {
     eyebrow: t('campaign.eyebrow'),
     title: t('campaign.title'),
     introduction: t('campaign.intro'),
@@ -475,22 +495,20 @@ export default function App() {
     copyLinkLabel: t('campaign.copyLink'),
     linkCopiedStatus: t('campaign.linkCopied'),
     copyFailedStatus: t('campaign.copyFailed'),
-    printCardLabel: t('campaign.printCard'),
     cardAriaLabel: t('campaign.cardAria'),
     cardKicker: t('campaign.cardKicker'),
+    cardTitle: t('campaign.name'),
     cardBody: t('campaign.cardBody'),
     qrAlt: t('campaign.qrAlt'),
     qrUnavailable: t('campaign.qrUnavailable'),
-    campusFieldLabel: t('campaign.campusField'),
     linkFieldLabel: t('campaign.linkField'),
-    accessCodeFieldLabel: t('campaign.codeField'),
     cardPrivacyLine: t('campaign.privacyLine'),
     careTitle: t('campaign.careTitle'),
     careBody: t('campaign.careBody'),
     careActionLabel: t('campaign.careAction'),
-    referralTitle: t('campaign.referralTitle'),
-    referralBody: t('campaign.referralBody'),
-    referralActionLabel: t('campaign.referralAction'),
+    summaryTitle: t('campaign.referralTitle'),
+    summaryBody: t('campaign.referralBody'),
+    summaryActionLabel: t('campaign.referralAction'),
     shareTitle: t('campaign.shareTitle'),
     shareBody: t('campaign.shareBody'),
     shareActionLabel: t('campaign.shareAction'),
@@ -700,6 +718,7 @@ export default function App() {
           <a href="#calibration">{t('nav.calibration')}</a>
           <a href="#vision-test">{t('nav.screening')}</a>
           <a href="#continuous-monitoring">{t('nav.continuous')}</a>
+          {runtime === 'web' && <DownloadAppsMenu copy={downloadAppsCopy} />}
           <span className={`privacy-chip ${active ? 'is-active' : ''}`}>
             <span /> {t('nav.local')}
           </span>
@@ -951,15 +970,12 @@ export default function App() {
           />
         </div>
 
-        <CampaignAccess
-          campaignName={campaignConfig.campaignName ?? t('campaign.name')}
-          campusName={campaignConfig.campusName ?? t('campaign.campusName')}
-          accessCode={campaignConfig.accessCode}
+        <UserSupport
           careAction={{
             onActivate: () =>
               document.getElementById('method-title')?.scrollIntoView({ behavior: 'smooth' }),
           }}
-          referralAction={campaignConfig.referralUrl
+          summaryAction={campaignConfig.referralUrl
             ? {
                 href: campaignConfig.referralUrl,
                 openInNewTab:
@@ -974,7 +990,7 @@ export default function App() {
                     ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 },
               }}
-          copy={campaignCopy}
+          copy={userSupportCopy}
         />
 
         <section className="method-section" aria-labelledby="method-title">

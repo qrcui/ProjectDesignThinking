@@ -18,6 +18,9 @@ visionguard-ai/coverage/
 *.tsbuildinfo
 *.log
 
+# Local staging folders for manually uploading GitHub Release assets
+/GitHub-Release-*/
+
 # Python caches
 __pycache__/
 *.py[cod]
