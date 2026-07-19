@@ -50,19 +50,19 @@ export function DownloadAppsMenu({ copy }: DownloadAppsMenuProps) {
       id: 'linux',
       label: copy.linuxLabel,
       detail: copy.linuxDetail,
-      href: `${RELEASE_DOWNLOAD_ROOT}/VisionGuard-AI-1.0.0-linux-x64.AppImage`,
+      href: `${RELEASE_DOWNLOAD_ROOT}/VisionGuard-AI-1.0.0-linux-x64.zip`,
     },
     {
       id: 'mac-arm',
       label: copy.macArmLabel,
       detail: copy.macArmDetail,
-      href: `${RELEASE_DOWNLOAD_ROOT}/VisionGuard-AI-1.0.0-mac-arm64.dmg`,
+      href: `${RELEASE_DOWNLOAD_ROOT}/VisionGuard-AI-1.0.0-mac-arm64-unsigned.zip`,
     },
     {
       id: 'mac-intel',
       label: copy.macIntelLabel,
       detail: copy.macIntelDetail,
-      href: `${RELEASE_DOWNLOAD_ROOT}/VisionGuard-AI-1.0.0-mac-x64.dmg`,
+      href: `${RELEASE_DOWNLOAD_ROOT}/VisionGuard-AI-1.0.0-mac-x64-unsigned.zip`,
     },
   ];
 
