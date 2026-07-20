@@ -139,8 +139,6 @@ npm install
 npm run desktop
 ```
 
-有关安全边界、摄像头权限、打包命令、签名要求和后台运行限制，请参阅 [DESKTOP.md](DESKTOP.md)。
-
 ### 移动端使用
 
 摄像头请求优先选择前置摄像头，界面分别适配窄竖屏和低高度横屏。手机必须通过 HTTPS 部署访问应用（开发期间也可使用手机自身的 `localhost`）；其他电脑的 `127.0.0.1` 无法从手机访问。使用实体卡/护照校准时，如果窄屏无法完整容纳轮廓，可将手机旋转为横屏，或使用明确标记的屏幕对角线估算。仍需在每种支持的手机/浏览器组合上验收真实摄像头性能和物理精度。
@@ -163,8 +161,6 @@ https://screening.example.edu/?campus=North%20Campus&campaign=Healthy%20Eyes%20W
 ```
 
 无效、超长、相对、包含凭据或不安全的转介参数会被忽略，并继续使用本地化的应用默认值。URL 参数只配置公开活动信息，不包含或传输筛查结果。
-
-有关推荐的 HTTPS 静态托管、临时隧道、校园内网方案、PWA/原生升级路径，以及为什么其他手机无法打开 localhost 二维码，请参阅 [DEPLOYMENT_QR.md](DEPLOYMENT_QR.md)。
 
 ## 测试与质量检查
 
@@ -255,7 +251,7 @@ D_now = D_ref × R_ref / R_now
 - Linux：`npm run desktop:dist:linux` 创建 AppImage 和 deb 包。
 - macOS：在 macOS 上运行 `npm run desktop:dist:mac`，分别创建 Intel 和 Apple Silicon DMG。
 
-Android 权限、签名和设备测试见 [ANDROID.md](ANDROID.md)；桌面运行时、签名和打包细节见 [DESKTOP.md](DESKTOP.md)。仓库级 `Package applications` GitHub Actions 工作流可在手动触发或推送 `v*` 标签时，在各原生宿主上构建未签名/测试产物。
+仓库级 `Package applications` GitHub Actions 工作流可在手动触发或推送 `v*` 标签时，在各原生宿主上构建未签名/测试产物。
 
 ## 项目结构
 
@@ -278,9 +274,6 @@ visionguard-ai/
 │   └── language-typography.css  # 英文专用间距和换行
 ├── dist/                        # 已验证的生产构建
 ├── serve_dist.py                # 无依赖本地静态服务器
-├── ANDROID.md                   # Android APK、签名和设备测试指南
-├── DESKTOP.md                   # Windows/Linux/macOS 打包指南
-├── DEPLOYMENT_QR.md             # HTTPS 托管和扫码即用路径
 ├── VALIDATION.md                # 交付验证记录
 ├── THIRD_PARTY_NOTICES.md
 ├── README.zh-CN.md              # 简体中文文档

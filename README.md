@@ -32,10 +32,6 @@ Live site: [projectdesignthinking.pages.dev](https://projectdesignthinking.pages
 
 ## Quick links
 
-- [Application source](visionguard-ai/)
-- [Android packaging guide](visionguard-ai/ANDROID.md)
-- [Desktop packaging guide](visionguard-ai/DESKTOP.md)
-- [HTTPS and QR deployment guide](visionguard-ai/DEPLOYMENT_QR.md)
 - [Validation record](visionguard-ai/VALIDATION.md)
 - [Releases](https://github.com/Inv1dx/ProjectDesignThinking/releases)
 

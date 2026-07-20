@@ -139,8 +139,6 @@ npm install
 npm run desktop
 ```
 
-See [DESKTOP.md](DESKTOP.md) for the security boundary, camera permission behavior, packaging commands, signing requirements, and limits of background operation.
-
 ### Mobile use
 
 The camera request prefers the front-facing camera and the interface has separate narrow portrait and short landscape layouts. A phone must open the app from an HTTPS deployment (or its own `localhost` during development); another computer's `127.0.0.1` address is not reachable from the phone. For physical card/passport calibration, rotate a narrow phone to landscape if the complete outline cannot fit, or use the clearly marked screen-diagonal estimate. Real-device camera performance and physical accuracy must still be acceptance-tested on each supported phone/browser combination.
@@ -163,8 +161,6 @@ https://screening.example.edu/?campus=North%20Campus&campaign=Healthy%20Eyes%20W
 ```
 
 Invalid, over-length, relative, credential-bearing, or unsafe referral values are ignored and the localized in-app defaults remain in use. URL parameters configure public campaign information only; they never contain or transmit screening results.
-
-See [DEPLOYMENT_QR.md](DEPLOYMENT_QR.md) for the recommended HTTPS static-hosting route, temporary tunnel and campus-intranet alternatives, PWA/native upgrade paths, and the reason a localhost QR code cannot be opened from a different phone.
 
 ## Testing and Quality Checks
 
@@ -257,8 +253,6 @@ Recalibrate after changing the display, browser zoom, screen scaling, or display
 - macOS: `npm run desktop:dist:mac` creates separate Intel and Apple Silicon
   DMGs on macOS.
 
-See [ANDROID.md](ANDROID.md) for Android permissions, signing, and device tests,
-and [DESKTOP.md](DESKTOP.md) for desktop runtime, signing, and packaging details.
 The repository-level `Package applications` GitHub Actions workflow can build
 unsigned/test artifacts on each native host when manually dispatched or when a
 `v*` tag is pushed.
@@ -284,9 +278,6 @@ visionguard-ai/
 │   └── language-typography.css  # English-specific spacing and wrapping
 ├── dist/                        # Validated production build
 ├── serve_dist.py                # Dependency-free local static server
-├── ANDROID.md                   # Android APK, signing, and device-test guide
-├── DESKTOP.md                   # Windows/Linux/macOS packaging guide
-├── DEPLOYMENT_QR.md             # HTTPS hosting and scan-to-use paths
 ├── VALIDATION.md                # Delivery validation record
 ├── THIRD_PARTY_NOTICES.md
 ├── README.zh-CN.md              # Simplified Chinese documentation
