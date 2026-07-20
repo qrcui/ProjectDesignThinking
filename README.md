@@ -16,6 +16,20 @@ Privacy-first visual-acuity screening and digital-eye-strain monitoring across t
 
 ![VisionGuard AI desktop interface](visionguard-ai/docs/screenshots/desktop.png)
 
+## Try the live prototype / 扫码体验
+
+Scan the QR code to experience VisionGuard AI in your browser.
+
+使用手机扫描二维码，即可在浏览器中体验 VisionGuard AI。
+
+[![Scan to experience VisionGuard AI](visionguard-ai/docs/projectdesignthinking-pages-qr.png)](https://projectdesignthinking.pages.dev/)
+
+Live site: [projectdesignthinking.pages.dev](https://projectdesignthinking.pages.dev/)
+
+## Technical report
+
+- [VisionGuard AI Technical Implementation Report (English PDF)](visionguard-ai/docs/VisionGuard_AI_Technical_Report_EN.pdf)
+
 ## Quick links
 
 - [Application source](visionguard-ai/)
